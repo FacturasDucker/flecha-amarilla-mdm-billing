@@ -26,7 +26,7 @@ public class MessageProducerService {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Inject
-    @Channel("raw-data")
+    @Channel("raw-data-api")
     Emitter<String> rawDataEmitter;
 
     /**
