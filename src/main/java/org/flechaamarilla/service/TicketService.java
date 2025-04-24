@@ -1,11 +1,11 @@
 package org.flechaamarilla.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -23,7 +23,12 @@ public class TicketService {
     ObjectMapper objectMapper;
 
     // For the MVP, we'll store some sample data in memory
-    private final Map<Long, Map<String, String>> mockTickets = initMockTickets();
+    private Map<Long, Map<String, String>> mockTickets;
+
+    @PostConstruct
+    void init() {
+        mockTickets = initMockTickets();
+    }
 
     /**
      * Gets ticket data for a given token and business unit
@@ -63,22 +68,28 @@ public class TicketService {
     private Map<Long, Map<String, String>> initMockTickets() {
         Map<Long, Map<String, String>> result = new HashMap<>();
 
-        // Business Unit 1 - Standard field names
-        Map<String, String> bu1Tickets = new HashMap<>();
-        bu1Tickets.put("ticket-123", createTicketData1());
-        result.put(1L, bu1Tickets);
+        try {
+            // Business Unit 1 - Standard field names
+            Map<String, String> bu1Tickets = new HashMap<>();
+            bu1Tickets.put("ticket-123", createTicketData1());
+            result.put(1L, bu1Tickets);
 
-        // Business Unit 2 - Different field names
-        Map<String, String> bu2Tickets = new HashMap<>();
-        bu2Tickets.put("ticket-456", createTicketData2());
-        result.put(2L, bu2Tickets);
+            // Business Unit 2 - Different field names
+            Map<String, String> bu2Tickets = new HashMap<>();
+            bu2Tickets.put("ticket-456", createTicketData2());
+            result.put(2L, bu2Tickets);
 
-        // Business Unit 3 - Yet another set of field names
-        Map<String, String> bu3Tickets = new HashMap<>();
-        bu3Tickets.put("ticket-789", createTicketData3());
-        result.put(3L, bu3Tickets);
+            // Business Unit 3 - Yet another set of field names
+            Map<String, String> bu3Tickets = new HashMap<>();
+            bu3Tickets.put("ticket-789", createTicketData3());
+            result.put(3L, bu3Tickets);
 
-        return result;
+            return result;
+        } catch (Exception e) {
+            log.error("Error initializing mock ticket data", e);
+            // Return an empty map as fallback
+            return new HashMap<>();
+        }
     }
 
     /**
@@ -86,6 +97,11 @@ public class TicketService {
      */
     private String createTicketData1() {
         try {
+            if (objectMapper == null) {
+                log.error("ObjectMapper is null in createTicketData1");
+                return "{}";
+            }
+
             ObjectNode root = objectMapper.createObjectNode();
             root.put("ticketId", "123456");
             root.put("fecha", "2023-04-23");
@@ -124,6 +140,11 @@ public class TicketService {
      */
     private String createTicketData2() {
         try {
+            if (objectMapper == null) {
+                log.error("ObjectMapper is null in createTicketData2");
+                return "{}";
+            }
+
             ObjectNode root = objectMapper.createObjectNode();
             root.put("id", "456789");
             root.put("date", "2023-04-23");
@@ -162,6 +183,11 @@ public class TicketService {
      */
     private String createTicketData3() {
         try {
+            if (objectMapper == null) {
+                log.error("ObjectMapper is null in createTicketData3");
+                return "{}";
+            }
+
             ObjectNode root = objectMapper.createObjectNode();
             root.put("folio", "789012");
             root.put("fechaEmision", "2023-04-23");
