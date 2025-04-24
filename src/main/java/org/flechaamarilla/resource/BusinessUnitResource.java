@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.flechaamarilla.dto.BusinessUnitDTO;
 import org.flechaamarilla.model.BusinessUnit;
 import org.flechaamarilla.model.FieldMapping;
 import org.flechaamarilla.service.BusinessUnitService;
@@ -66,6 +67,21 @@ public class BusinessUnitResource {
     @Transactional
     public Response createBusinessUnit(BusinessUnit businessUnit) {
         BusinessUnit created = businessUnitService.createBusinessUnit(businessUnit);
+        return Response.status(Response.Status.CREATED).entity(created).build();
+    }
+
+    /**
+     * Creates a new business unit with field mappings in a single operation
+     *
+     * @param dto The business unit DTO with mappings
+     * @return The created business unit
+     */
+    @POST
+    @Path("/with-mappings")
+    @Operation(summary = "Create a business unit with its field mappings in one operation")
+    @Transactional
+    public Response createBusinessUnitWithMappings(BusinessUnitDTO dto) {
+        BusinessUnit created = businessUnitService.createBusinessUnitWithMappings(dto);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
 

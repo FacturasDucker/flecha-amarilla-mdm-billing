@@ -2,9 +2,11 @@ package org.flechaamarilla.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import org.flechaamarilla.dto.BusinessUnitDTO;
 import org.flechaamarilla.model.BusinessUnit;
 import org.flechaamarilla.model.FieldMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,6 +36,43 @@ public class BusinessUnitService {
     @Transactional
     public BusinessUnit createBusinessUnit(BusinessUnit businessUnit) {
         businessUnit.persist();
+        return businessUnit;
+    }
+
+    /**
+     * Creates a new business unit with field mappings in a single transaction
+     *
+     * @param dto The business unit DTO containing mappings
+     * @return The created business unit with ID and mappings
+     */
+    @Transactional
+    public BusinessUnit createBusinessUnitWithMappings(BusinessUnitDTO dto) {
+        // Create the business unit
+        BusinessUnit businessUnit = new BusinessUnit();
+        businessUnit.setName(dto.getName());
+        businessUnit.setDescription(dto.getDescription());
+        businessUnit.setRfcEmitter(dto.getRfcEmitter());
+        businessUnit.setEmitterName(dto.getEmitterName());
+        businessUnit.setDefaultCurrency(dto.getDefaultCurrency());
+        businessUnit.setSeries(dto.getSeries());
+        businessUnit.persist();
+
+        // Create field mappings
+        List<FieldMapping> mappings = new ArrayList<>();
+        if (dto.getFieldMappings() != null) {
+            for (BusinessUnitDTO.FieldMappingDTO mappingDto : dto.getFieldMappings()) {
+                FieldMapping mapping = new FieldMapping();
+                mapping.setSourceFieldName(mappingDto.getSourceFieldName());
+                mapping.setStandardFieldName(mappingDto.getStandardFieldName());
+                mapping.setBusinessUnit(businessUnit);
+                mapping.persist();
+                mappings.add(mapping);
+            }
+        }
+
+        // Set field mappings
+        businessUnit.setFieldMappings(mappings);
+
         return businessUnit;
     }
 
